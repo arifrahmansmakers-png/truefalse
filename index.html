@@ -26,6 +26,11 @@
       <video id="webcam" class="absolute w-full h-full object-cover scale-x-[-1]" playsinline></video>
       <canvas id="output_canvas" class="absolute w-full h-full object-cover scale-x-[-1]"></canvas>
 
+      <!-- PERTANYAAN DI TENGAH ATAS LAYAR -->
+      <div id="soal-container" class="absolute top-4 left-4 right-4 z-20 bg-slate-900/85 border border-slate-600 px-6 py-3 rounded-2xl shadow-xl backdrop-blur-md flex items-center justify-center text-center">
+        <h2 id="pertanyaan" class="text-xl md:text-2xl font-bold text-white drop-shadow">Memuat Soal dari Google Sheets...</h2>
+      </div>
+
       <!-- Overlay Pop-up Hasil Evaluasi (Benar / Salah) -->
       <div id="popup-evaluasi" class="hidden absolute z-30 flex flex-col items-center justify-center p-6 bg-slate-900/90 rounded-3xl border-2 shadow-2xl backdrop-blur-md">
         <div id="popup-emoji" class="text-7xl mb-2">🎉</div>
@@ -56,11 +61,6 @@
         <span id="soal-index">Soal 0 dari 0</span>
         <span id="timer-text" class="text-yellow-400 text-base">Sisa Waktu: --</span>
         <span id="skor-text">Skor: 0</span>
-      </div>
-
-      <!-- Teks Pertanyaan -->
-      <div id="soal-container" class="min-h-[80px] flex items-center justify-center mb-6">
-        <h2 id="pertanyaan" class="text-2xl font-bold text-white">Memuat Soal dari Google Sheets...</h2>
       </div>
 
       <!-- Kartu Opsi Jawaban -->
