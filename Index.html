@@ -86,7 +86,6 @@
     // =========================================================================
     // TEMPAT MENARUH LINK CSV GOOGLE SHEETS
     // =========================================================================
-    // Salin link CSV dari Google Sheets (File > Share > Publish to Web > CSV)
     const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTChgAcjMHAYhF-bblNpuBKQVcCpDFkpHQ9mDHm_OoAejCBQZyVu9IqSs5Fg9FwPcb6lU9HvCyD2ZCm/pub?output=csv";
 
     // Data Soal Global
@@ -114,7 +113,7 @@
 
     function playSoundSuccess() {
       if (audioCtx.state === 'suspended') audioCtx.resume();
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // Arpeggio C Major (C5, E5, G5, C6)
+      const notes = [523.25, 659.25, 783.99, 1046.50];
       notes.forEach((freq, i) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -167,14 +166,12 @@
         if (!response.ok) throw new Error("Gagal mengunduh file CSV.");
         const textData = await response.text();
 
-        // Regex CSV Parser untuk menangani koma di dalam tanda kutip
         const rows = textData.trim().split(/\r?\n/);
         const hasilSoal = [];
 
         for (let i = 1; i < rows.length; i++) {
           if (!rows[i].trim()) continue;
           
-          // Memisah baris CSV berdasarkan koma
           const cols = rows[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || rows[i].split(',');
           const cleanCols = cols.map(c => c.replace(/^"|"$/g, '').trim());
 
@@ -183,7 +180,7 @@
               pertanyaan: cleanCols[0],
               kiri: cleanCols[1],
               kanan: cleanCols[2],
-              jawabanBenar: cleanCols[3].toLowerCase() // 'kiri' atau 'kanan'
+              jawabanBenar: cleanCols[3].toLowerCase()
             });
           }
         }
@@ -237,7 +234,7 @@
 
       if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
         const landmarks = results.multiFaceLandmarks[0];
-        const noseX = landmarks[1].x; // Koordinat X hidung (0.0 - 1.0)
+        const noseX = landmarks[1].x;
 
         if (!kameraSiap) {
           kameraSiap = true;
@@ -247,7 +244,6 @@
           }
         }
 
-        // Posisi Kepala (Mirror Input)
         if (!sedangEvaluasi) {
           if (noseX > 0.53) {
             pilihanPemain = "kiri";
@@ -272,11 +268,11 @@
     function updatePilihanUI(text) {
       document.getElementById('pilihan-text').innerText = text;
 
-      zoneKiri.className = "absolute left-0 top-0 w-1/2 h-full border-r-2 border-white/20 flex flex-col items-center justify-center transition-all duration-300 " + 
-        (pilihanPemain === "kiri" ? "bg-blue-500/50 ring-4 ring-blue-400 inset-0" : "bg-blue-500/20");
+      zoneKiri.className = "absolute left-0 top-0 w-1/2 h-full border-r-2 border-white/25 flex flex-col items-center justify-center transition-all duration-300 " + 
+        (pilihanPemain === "kiri" ? "bg-blue-500/50 ring-4 ring-blue-400 inset-0 z-10" : "bg-blue-500/20");
         
-      zoneKanan.className = "absolute right-0 top-0 w-1/2 h-full border-l-2 border-white/20 flex flex-col items-center justify-center transition-all duration-300 " + 
-        (pilihanPemain === "kanan" ? "bg-emerald-500/50 ring-4 ring-emerald-400 inset-0" : "bg-emerald-500/20");
+      zoneKanan.className = "absolute right-0 top-0 w-1/2 h-full border-l-2 border-white/25 flex flex-col items-center justify-center transition-all duration-300 " + 
+        (pilihanPemain === "kanan" ? "bg-emerald-500/50 ring-4 ring-emerald-400 inset-0 z-10" : "bg-emerald-500/20");
     }
 
     // =========================================================================
@@ -333,16 +329,14 @@
       const soal = daftarSoal[currentSoalIndex];
       const jawabanBenar = soal.jawabanBenar;
 
-      // Layar Terbagi 2 (Hijau untuk Benar, Merah untuk Salah)
       if (jawabanBenar === "kiri") {
-        zoneKiri.className = "absolute left-0 top-0 w-1/2 h-full bg-green-500/70 flex flex-col items-center justify-center transition-all duration-300 border-4 border-green-400 z-10";
-        zoneKanan.className = "absolute right-0 top-0 w-1/2 h-full bg-red-500/70 flex flex-col items-center justify-center transition-all duration-300 border-4 border-red-400 z-10";
+        zoneKiri.className = "absolute left-0 top-0 w-1/2 h-full bg-green-500/70 flex flex-col items-center justify-center transition-all duration-300 border-4 border-green-400 z-20";
+        zoneKanan.className = "absolute right-0 top-0 w-1/2 h-full bg-red-500/70 flex flex-col items-center justify-center transition-all duration-300 border-4 border-red-400 z-20";
       } else {
-        zoneKiri.className = "absolute left-0 top-0 w-1/2 h-full bg-red-500/70 flex flex-col items-center justify-center transition-all duration-300 border-4 border-red-400 z-10";
-        zoneKanan.className = "absolute right-0 top-0 w-1/2 h-full bg-green-500/70 flex flex-col items-center justify-center transition-all duration-300 border-4 border-green-400 z-10";
+        zoneKiri.className = "absolute left-0 top-0 w-1/2 h-full bg-red-500/70 flex flex-col items-center justify-center transition-all duration-300 border-4 border-red-400 z-20";
+        zoneKanan.className = "absolute right-0 top-0 w-1/2 h-full bg-green-500/70 flex flex-col items-center justify-center transition-all duration-300 border-4 border-green-400 z-20";
       }
 
-      // Animasi Pop-Up Evaluasi
       const isCorrect = (pilihanPemain === jawabanBenar);
       
       if (isCorrect) {
@@ -365,7 +359,6 @@
       popupEvaluasi.classList.remove('hidden');
       document.getElementById('skor-text').innerText = `Skor: ${skor}`;
 
-      // Jeda 2.5 detik sebelum soal berikutnya
       setTimeout(() => {
         currentSoalIndex++;
         tampilkanSoal();
@@ -384,9 +377,7 @@
       btnStart.disabled = false;
     }
 
-    // Jalankan pengambilan soal saat halaman pertama dibuka
     muatSoalDariGoogleSheets();
   </script>
 </body>
 </html>
-
