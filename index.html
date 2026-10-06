@@ -92,7 +92,7 @@
     let daftarSoal = [];
     let currentSoalIndex = 0;
     let skor = 0;
-    let sisaWaktu = 5;
+    let sisaWaktu = 10; // Diubah menjadi 10 detik
     let timerInterval = null;
     let pilihanPemain = "tengah";
     let gameBerjalan = false;
@@ -158,7 +158,7 @@
     }
 
     // =========================================================================
-    // FUNGSI MEMUAT DATA DARI GOOGLE SHEETS (CSV PARSER)
+    // FUNGSI MEMUAT DATA DARI GOOGLE SHEETS (Mulai dari A2 dan seterusnya)
     // =========================================================================
     async function muatSoalDariGoogleSheets() {
       try {
@@ -169,6 +169,7 @@
         const rows = textData.trim().split(/\r?\n/);
         const hasilSoal = [];
 
+        // Mulai dari i = 1 untuk melewati baris header (baris 1 / A1), sehingga data dibaca mulai dari baris ke-2 (A2)
         for (let i = 1; i < rows.length; i++) {
           if (!rows[i].trim()) continue;
           
@@ -307,7 +308,7 @@
       document.getElementById('jawaban-kiri').innerText = soal.kiri;
       document.getElementById('jawaban-kanan').innerText = soal.kanan;
 
-      sisaWaktu = 5;
+      sisaWaktu = 10; // Waktu menjawab diatur 10 detik
       document.getElementById('timer-text').innerText = `Sisa Waktu: ${sisaWaktu}s`;
 
       clearInterval(timerInterval);
