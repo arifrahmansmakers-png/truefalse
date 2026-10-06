@@ -92,7 +92,7 @@
     let daftarSoal = [];
     let currentSoalIndex = 0;
     let skor = 0;
-    let sisaWaktu = 10; // Diubah menjadi 10 detik
+    let sisaWaktu = 10;
     let timerInterval = null;
     let pilihanPemain = "tengah";
     let gameBerjalan = false;
@@ -143,23 +143,44 @@
       osc.stop(audioCtx.currentTime + 0.4);
     }
 
-    function playSoundTick() {
+    // Musik Reaksi / Efek Detak setiap waktu berjalan
+    function playSoundTick(isUrgent = false) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
+      osc.type = isUrgent ? 'square' : 'sine';
+      osc.frequency.setValueAtTime(isUrgent ? 880 : 500, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.08);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
-      osc.stop(audioCtx.currentTime + 0.05);
+      osc.stop(audioCtx.currentTime + 0.08);
     }
 
     // =========================================================================
-    // FUNGSI MEMUAT DATA DARI GOOGLE SHEETS (Mulai dari A2 dan seterusnya)
+    // FUNGSI PARSER CSV YANG AMAN UNTUK TEKS KALIMAT PANJANG
     // =========================================================================
+    function parseCSVRow(text) {
+      let result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        let char = text[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim().replace(/^"|"$/g, ''));
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim().replace(/^"|"$/g, ''));
+      return result;
+    }
+
     async function muatSoalDariGoogleSheets() {
       try {
         const response = await fetch(GOOGLE_SHEET_CSV_URL);
@@ -169,12 +190,11 @@
         const rows = textData.trim().split(/\r?\n/);
         const hasilSoal = [];
 
-        // Mulai dari i = 1 untuk melewati baris header (baris 1 / A1), sehingga data dibaca mulai dari baris ke-2 (A2)
+        // Mulai dari i = 1 untuk melewati baris header (A1)
         for (let i = 1; i < rows.length; i++) {
           if (!rows[i].trim()) continue;
           
-          const cols = rows[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || rows[i].split(',');
-          const cleanCols = cols.map(c => c.replace(/^"|"$/g, '').trim());
+          const cleanCols = parseCSVRow(rows[i]);
 
           if (cleanCols.length >= 4) {
             hasilSoal.push({
@@ -308,7 +328,7 @@
       document.getElementById('jawaban-kiri').innerText = soal.kiri;
       document.getElementById('jawaban-kanan').innerText = soal.kanan;
 
-      sisaWaktu = 10; // Waktu menjawab diatur 10 detik
+      sisaWaktu = 10;
       document.getElementById('timer-text').innerText = `Sisa Waktu: ${sisaWaktu}s`;
 
       clearInterval(timerInterval);
@@ -316,7 +336,12 @@
         sisaWaktu--;
         document.getElementById('timer-text').innerText = `Sisa Waktu: ${sisaWaktu}s`;
         
-        if (sisaWaktu <= 3 && sisaWaktu > 0) playSoundTick();
+        // Bunyi musik reaksi/detak setiap detik berjalan
+        if (sisaWaktu <= 3 && sisaWaktu > 0) {
+          playSoundTick(true); // Suara lebih tinggi/urgent di 3 detik terakhir
+        } else if (sisaWaktu > 0) {
+          playSoundTick(false); // Suara detak normal tiap detik
+        }
 
         if (sisaWaktu <= 0) {
           clearInterval(timerInterval);
